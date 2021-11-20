@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -34,6 +35,16 @@ public class ReviewController {
     @GetMapping
     public List<Review> all() {
         return reviewService.getAllEntities();
+    }
+
+    @GetMapping(params = "owner")
+    public List<Review> allByOwner(@RequestParam("owner") Long owner) {
+        return reviewService.getAllByOwner(owner);
+    }
+
+    @GetMapping(params = "writer")
+    public List<Review> allByWriter(@RequestParam("writer") Long writer) {
+        return reviewService.getAllByWriter(writer);
     }
 
     @PostMapping("/submit")

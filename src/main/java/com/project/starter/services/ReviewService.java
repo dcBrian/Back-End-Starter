@@ -36,20 +36,25 @@ public class ReviewService {
     }
 
     // Retrieve By Owner
-    public List<Review> getAllByOwnerId(Long userId) {
+    public List<Review> getAllByOwner(Long ownerId) {
+        User owner = userService.getOneEntity(ownerId);
+        return reviewRepository.findByOwner(owner);
+    }
+
+    public List<Review> getAllByOwnerAndStatus(Long userId, boolean status) {
         User user = userService.getOneEntity(userId);
-        return reviewRepository.findByOwner(user.getId());
+        return reviewRepository.findByOwnerAndStatus(user, status);
     }
 
     // Retrieve By Writer
-    public List<Review> getAllByWriterToBeDone(Long userId) {
-        User user = userService.getOneEntity(userId);
-        return reviewRepository.findByWriterAndStatusIsFalse(user.getId());
+    public List<Review> getAllByWriter(Long userId) {
+        User writer = userService.getOneEntity(userId);
+        return reviewRepository.findByWriter(writer);
     }
 
-    public List<Review> getAllByWriter(Long userId) {
+    public List<Review> getAllByWriterAndStatus(Long userId, boolean status) {
         User user = userService.getOneEntity(userId);
-        return reviewRepository.findByWriter(user.getId());
+        return reviewRepository.findByWriterAndStatus(user, status);
     }
 
     // Assign Review to Multiple Writers
@@ -59,11 +64,10 @@ public class ReviewService {
         if (writers.size() != input.getWriters().size()) {
             List<Long> retrieved = writers.stream().map(e -> e.getId()).collect(Collectors.toList());
             List<Long> diff = Utilities.findDifferentElements(input.getWriters(), retrieved);
-            throw new ResourceNotFoundException(String.format("Users with ids { %s } could not be found.", diff));
+            throw new ResourceNotFoundException(String.format("Users with ids { %s }could not be found.", diff));
         }
 
         User owner = userService.getOneEntity(input.getOwner());
-
         List<Review> reviews = writers.stream().map(w -> new Review(owner, w)).collect(Collectors.toList());
         reviewRepository.saveAll(reviews);
 
